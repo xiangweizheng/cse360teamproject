@@ -23,8 +23,9 @@ public class networkanalyzer {
 		HashSet<Task> allTasks = new HashSet<Task>();
 		//demo example
 		int i=0;//task id
-	 //   Task end = new Task("End",i++, 0);    
-	    Task E = new Task("E",i++,20);   
+	    //Task end = new Task("End",i++, 0);    
+	   // Task E = new Task("E",i++,20,end);   
+		Task E = new Task("E",i++,20);
 	    Task G = new Task("G",i++,5,E);
 	    Task F = new Task("F",i++,15,G);
 	    Task H = new Task("H",i++,15,E); 
@@ -32,8 +33,8 @@ public class networkanalyzer {
 	    Task C = new Task("C",i++, 5, D, G);
 	    Task B = new Task("B",i++, 20, C);
 	    Task A = new Task("A",i++, 10, F,B,H);
-	//    Task start = new Task("Start",9, 0, A);
-	//    allTasks.add(end);
+	 //   Task start = new Task("Start",9, 0, A);
+	   // allTasks.add(end);
 	    allTasks.add(A);
 	    allTasks.add(B);
 	    allTasks.add(C);
@@ -56,6 +57,7 @@ public class networkanalyzer {
 	    
 	    //initial value of source and destination task
 	    int src=99,des=99;
+	    int descost=0;
 	    
 	    //process to generate graph from task
 	    HashSet<Task> dependtask = new HashSet<Task>();
@@ -70,12 +72,12 @@ public class networkanalyzer {
 	        Task task = it.next();
 	        hmap.put(task.id,task.name);//store task id and name into hashmap
 	        //find des node by dependencies empty
-	        if(task.dependencies.isEmpty()) {des=task.id;System.out.println("des"+des);}
+	        if(task.dependencies.isEmpty()) {des=task.id;System.out.println("des"+des);descost=task.cost;}
 	        for(Task t : task.dependencies){
 	        	graph.addEgde(task.id, t.id, task.cost);
 	        	dependtask.add(t);
 	          }
-      
+        
 	        it.remove();
 	      }   
 	        
@@ -105,10 +107,12 @@ public class networkanalyzer {
 	   // System.out.println(allpath);//test path print
 	    //System.out.println(allpath.get(0));//test path print
 	    
-	    
+
 	    //print path of task name 
 	    for(int k=0;k<allpath.size();k++) {
 	    	ArrayList<Integer> tpal=allpath.get(k);
+	    	int tp=tpal.get(0);
+	    	tpal.set(0,tp+descost);
 	    	System.out.println("path cost is "+tpal.get(0)+" path sequence is:");
 	    	for(int m=1;m<tpal.size();m++)
 	    	          {System.out.print(hmap.get(tpal.get(m)));
