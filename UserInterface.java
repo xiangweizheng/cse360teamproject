@@ -153,7 +153,8 @@ public class UserInterface {
 							
 							
 							if(!TaskisEmpty && !PredecessorisEmpty && predecessor.isSelected() && DurationisNumber) {
-								allTasks.add(new Task(task.getText().trim(), counter, number,null));
+								Task p = getTask(allTasks, preInput.getText().trim());
+								allTasks.add(new Task(task.getText().trim(), counter, number,p));//returns 1 predecessor
 							}
 							else if(!TaskisEmpty && DurationisNumber) {
 								output.append("Activity Entered!\n");
@@ -208,7 +209,7 @@ public class UserInterface {
 		frame.setVisible(true);
 	}
 	
-	public boolean isNumber(String str) {
+	public boolean isNumber(String str) {//determines if input is a number
 		char[] ch = str.toCharArray();
 		for(int i = 0; i < ch.length; i++) {
 			if(Character.isDigit(ch[i])) {
@@ -218,11 +219,11 @@ public class UserInterface {
 		return false;
 	}
 	
-	public static Task getTask(HashSet<Task> set, String t) {
+	public static Task getTask(HashSet<Task> set, String t) {//return prdecessor
 		return SearchforTask(set, t);
 	}
 	
-	public static Task SearchforTask(HashSet<Task> set, String t) {
+	public static Task SearchforTask(HashSet<Task> set, String t) {//search for predecessor
 		Task nt = null;
 		if(!set.isEmpty()) {
 			for(Iterator<Task> i = set.iterator(); i.hasNext();) {
@@ -236,3 +237,4 @@ public class UserInterface {
 	}
 	
 }
+
