@@ -149,16 +149,30 @@ public class wnetdiag {
     
     public boolean isConnect(){
     	for(int i=0;i < vertices; i++) 
-    		for(int j=i+1;j<vertices;j++)
-    			if(allpath(i,j).isEmpty()) //if any node pair cannot be reached return not connected
-    				//System.out.println("not connected");
-    				return false;
+    		for(int j=i+1;j<vertices-1;j++)
+    			//if any node pair cannot be reached return not connected
+    			//for directed graph need check both ij and ji
+    			if(allpath(i,j).isEmpty()&&allpath(j,i).isEmpty()) 
+    				{//System.out.println("i"+i+"j"+j+"\n");
+    				return false;}
     			
     	//if all nodes can reach each other return connected	
     	return true;
     }
     
 
+    public boolean isConnecttoEnd(int end){
+    	for(int i=0;i < vertices; i++) 
+    		 	//if any node pair cannot be reached return not connected
+    			//for directed graph need check both ij and ji
+    		if(i!=end)
+    			if(allpath(i,end).isEmpty()) 
+    				{//System.out.println("i"+i+"end"+end+"\n");
+    				return false;}
+    			
+    	//if all nodes can reach each other return connected	
+    	return true;
+    }
     
     
     
@@ -187,7 +201,7 @@ public class wnetdiag {
             graph.addEgde(2, 3, 7);
             graph.addEgde(3, 4, 2);
             graph.addEgde(5, 6, 6);//test connect
-           // graph.addEgde(4, 1, 2);//test circle
+            graph.addEgde(4, 1, 2);//test circle//something wrong when test 
             
             
             
@@ -212,6 +226,10 @@ public class wnetdiag {
             //System.out.println(allpath);
             //graph.allpath(3, 4);
             if(graph.isConnect())
+            	System.out.println("is connected");
+            else
+            	System.out.println("not connected");
+            if(graph.isConnecttoEnd(4))
             	System.out.println("is connected");
             else
             	System.out.println("not connected");
