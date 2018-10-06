@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.*;
 public class wnetdiag {
     static class Edge {
-        int source;
-        int destination;
-        int weight;
+        Integer source;
+        Integer destination;
+        Integer weight;
 
-        public Edge(int source, int destination, int weight) {
+        public Edge(Integer source, Integer destination, Integer weight) {
             this.source = source;
             this.destination = destination;
             this.weight = weight;
@@ -18,27 +18,28 @@ public class wnetdiag {
     }
 
     static class Graph {
-        int vertices;
+        Integer vertices;
         LinkedList<Edge> [] adjacencylist;
 
-        Graph(int vertices) {
+        Graph(Integer vertices) {
             this.vertices = vertices;
             adjacencylist = new LinkedList[vertices];
             //initialize adjacency lists for all the vertices
-            for (int i = 0; i <vertices ; i++) {
+            for (Integer i = 0; i <vertices ; i++) {
                 adjacencylist[i] = new LinkedList<>();
             }
         }
 
-        public void addEgde(int source, int destination, int weight) {
+        public void addEgde(Integer source, Integer destination, Integer weight) {
             Edge edge = new Edge(source, destination, weight);
             adjacencylist[source].addFirst(edge); //for directed graph
+            System.out.println("s"+source+"des"+destination);
         }
 
         public void printGraph(){
-            for (int i = 0; i <vertices ; i++) {
+            for (Integer i = 0; i <vertices ; i++) {
                 LinkedList<Edge> list = adjacencylist[i];
-                for (int j = 0; j <list.size() ; j++) {
+                for (Integer j = 0; j <list.size() ; j++) {
                     System.out.println("vertex-" + i + " is connected to " +
                             list.get(j).destination + " with weight " +  list.get(j).weight);
                 }
@@ -46,14 +47,14 @@ public class wnetdiag {
         }
 
 
-        public ArrayList<ArrayList<Integer>> allpath (int s,int d) { 
+        public ArrayList<ArrayList<Integer >> allpath (Integer s,Integer d) { 
         	//arraylist result to store all the paths
-        	ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+        	ArrayList<ArrayList<Integer >> result = new ArrayList<ArrayList<Integer >>();
         	      	
         	LinkedList<Edge> listad = adjacencylist[s];
-            for (int j = 0; j <listad.size() ; j++) {
+            for (Integer j = 0; j <listad.size() ; j++) {
             	   //arraylist list to store current path 
-             		ArrayList<Integer> list = new ArrayList<Integer>();
+             		ArrayList<Integer > list = new ArrayList<Integer >();
              		//update list and list weight
             		list.add(listad.get(j).weight);                	
                 	list.add(s);
@@ -65,7 +66,7 @@ public class wnetdiag {
             	else {
                     //if dependency is des just add current list to result
             		list.add(d);
-            		result.add(new ArrayList<Integer>(list));
+            		result.add(new ArrayList<Integer >(list));
             	}
             }
                  	
@@ -78,24 +79,24 @@ public class wnetdiag {
         
         
     
-    public void helpallpath(int s,int d,ArrayList<ArrayList<Integer>> result, ArrayList<Integer> list) {
+    public void helpallpath(Integer s,Integer d,ArrayList<ArrayList<Integer >> result, ArrayList<Integer > list) {
     	
             list.add(s);
             LinkedList<Edge> listad = adjacencylist[s];
             //DFS
-            for (int j = 0; j <listad.size() ; j++) {
+            for (Integer j = 0; j <listad.size() ; j++) {
             	if(d!=listad.get(j).destination) {
             		//list[0]+=listad.get(j).weight;
-            		ArrayList<Integer> listtp = new ArrayList<Integer>(list);
-            		int tp=listtp.get(0);
+            		ArrayList<Integer > listtp = new ArrayList<Integer >(list);
+            		Integer tp=listtp.get(0);
             		listtp.set(0,listad.get(j).weight+ tp);
             		helpallpath(listad.get(j).destination,d,result,listtp);
             	}
             	else {
             		list.add(d);
-            		int tp=list.get(0);
+            		Integer tp=list.get(0);
             		list.set(0,listad.get(j).weight+ tp);
-            		result.add(new ArrayList<Integer>(list));
+            		result.add(new ArrayList<Integer >(list));
             	}
                     
             }
@@ -115,7 +116,7 @@ public class wnetdiag {
          
          
         // Call the recursive helper function to detect cycle in different DFS trees
-        for (int i = 0; i < vertices; i++)
+        for (Integer i = 0; i < vertices; i++)
             if (isCyclicUtil(i, visited, recStack))
                 return true;
  
@@ -123,7 +124,7 @@ public class wnetdiag {
     }
     
     
-    private boolean isCyclicUtil(int i, boolean[] visited, boolean[] recStack) {
+    private boolean isCyclicUtil(Integer i, boolean[] visited, boolean[] recStack) {
          if (recStack[i])
             return true;
 
@@ -135,7 +136,7 @@ public class wnetdiag {
          recStack[i] = true;
          LinkedList<Edge> list = adjacencylist[i];
 
-       for (int j = 0; j <list.size() ; j++) {
+       for (Integer j = 0; j <list.size() ; j++) {
 	        if(isCyclicUtil(list.get(j).destination, visited, recStack))
 	          return true;
                 }
@@ -148,17 +149,31 @@ public class wnetdiag {
     
     
     public boolean isConnect(){
-    	for(int i=0;i < vertices; i++) 
-    		for(int j=i+1;j<vertices;j++)
-    			if(allpath(i,j).isEmpty()) //if any node pair cannot be reached return not connected
-    				//System.out.println("not connected");
-    				return false;
+    	for(Integer i=0;i < vertices; i++) 
+    		for(Integer j=i+1;j<vertices-1;j++)
+    			//if any node pair cannot be reached return not connected
+    			//for directed graph need check both ij and ji
+    			if(allpath(i,j).isEmpty()&&allpath(j,i).isEmpty()) 
+    				{//System.out.println("i"+i+"j"+j+"\n");
+    				return false;}
     			
     	//if all nodes can reach each other return connected	
     	return true;
     }
     
 
+    public boolean isConnecttoEnd(Integer end){
+    	for(Integer i=0;i < vertices; i++) 
+    		 	//if any node pair cannot be reached return not connected
+    			//for directed graph need check both ij and ji
+    		if(i!=end)
+    			if(allpath(i,end).isEmpty()) 
+    				{System.out.println("i"+i+"end"+end+"\n");
+    				return false;}
+    			
+    	//if all nodes can reach each other return connected	
+    	return true;
+    }
     
     
     
@@ -178,7 +193,7 @@ public class wnetdiag {
    
     
       public static void main(String[] args) {
-            int vertices = 7;
+            Integer vertices = 7;
             Graph graph = new Graph(vertices);
             graph.addEgde(0, 1, 4);
             graph.addEgde(0, 2, 4);
@@ -187,7 +202,7 @@ public class wnetdiag {
             graph.addEgde(2, 3, 7);
             graph.addEgde(3, 4, 2);
             graph.addEgde(5, 6, 6);//test connect
-           // graph.addEgde(4, 1, 2);//test circle
+          //  graph.addEgde(4, 1, 2);//test circle//something wrong when test 
             
             
             
@@ -202,16 +217,20 @@ public class wnetdiag {
             
           
            graph.printGraph();
-            ArrayList<ArrayList<Integer>> allpath = graph.allpath(0,6);
-            Collections.sort(allpath, new Comparator<ArrayList<Integer>>() {    
+            ArrayList<ArrayList<Integer >> allpath = graph.allpath(0,6);
+            Collections.sort(allpath, new Comparator<ArrayList<Integer >>() {    
                 @Override
-                public int compare(ArrayList<Integer> o1, ArrayList<Integer> o2) {
+                public int compare(ArrayList<Integer > o1, ArrayList<Integer > o2) {
                     return o1.get(0).compareTo(o2.get(0));
                 }               
         });
             //System.out.println(allpath);
             //graph.allpath(3, 4);
             if(graph.isConnect())
+            	System.out.println("is connected");
+            else
+            	System.out.println("not connected");
+            if(graph.isConnecttoEnd(4))
             	System.out.println("is connected");
             else
             	System.out.println("not connected");
