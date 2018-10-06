@@ -464,7 +464,7 @@ public class UserInterface {
 									if(c=='/') {		
 										
 										if(start!=i-1) {
-										tp.add(test.substring(start,i-1));
+										tp.add(test.substring(start,i-1+1));
 										//System.out.println(tp);
 										}
 										else {
@@ -476,7 +476,7 @@ public class UserInterface {
 									}
 									else if(i==test.length()-1) {
 										if(start!=i) {
-											tp.add(test.substring(start,i-1));
+											tp.add(test.substring(start,i+1));//substring bug: Start index is inclusiveEnd index is exclusive
 											//System.out.println(tp);
 											}
 											else {

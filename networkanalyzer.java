@@ -235,7 +235,7 @@ public class networkanalyzer {
 		    }
 		    @Override
 		    public String toString() {
-		      return name+id;
+		      return name;
 		    }
 		    public void adddep(Task d) {
 		    	this.dependencies.add(d);
