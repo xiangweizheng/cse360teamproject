@@ -1,1 +1,2 @@
 # cse360teamproject
+This document serves as the software user guide for the Network Analyser 2.1 and contains all the information needed for using the tool. Firstly, the document consists of the overview of the software, describe the usage, and the functional aspects of the software. Secondly, it acts as a manual describing the step-by-step procedures to perform different operations in the program.
