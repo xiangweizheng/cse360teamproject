@@ -5,4 +5,5 @@ Get started
 1. Download all the files in the project github website and unzip the files in a empty fold:
 https://github.com/xiangweizheng/cse360teamproject.git
 Or use git clone command
+
 2 Run the program, click "demo" button to load demo data and then click "finishenter" to  store the data. Click "path" to generate the all the path.
