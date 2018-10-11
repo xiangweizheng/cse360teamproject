@@ -33,7 +33,7 @@ public class UserInterface {
 	private JTextField task, duration, preInput;
 	private JTextArea output;
 	private JLabel tskLb, timeLb, preLb;
-	private JButton enter, reset, quit, print, clear,path,demo,demo_cycle,demo_connect,FinishEnter,help;
+	private JButton enter, reset, quit, print, clear,path,demo,demo_cycle,demo_connect,FinishEnter,help,about;
 	private JPanel Button_pnl, Input_pnl;
 	private Choice units;
 	private JSplitPane split;
@@ -118,13 +118,25 @@ public class UserInterface {
 			
 		});
 		
+		
+		about = new JButton("About");
+		about.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				output.append("This program is to analyze path in a network diagram\n");
+				
+			}
+			
+		});
+		
 	
 		split = new JSplitPane(); // splits the bottom half of the frame into an output group and button group
 		output = new JTextArea(20, 10);
 			output.setEditable(false);
 			
 		Button_pnl = new JPanel();// create a panel for two buttons named reset and quit
-			reset = new JButton("Reset");
+			reset = new JButton("Restart");
 				reset.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
@@ -212,7 +224,7 @@ public class UserInterface {
 					}
 				});
 				
-			path  = new JButton("Path");
+			path  = new JButton("Process");
 			path.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -405,7 +417,7 @@ public class UserInterface {
 			Button_pnl.add(demo_connect);
 			Button_pnl.add(FinishEnter);
 			Button_pnl.add(help);
-			
+			Button_pnl.add(about);
 		Input_pnl = new JPanel(); //is the upper half of the frame for user input
 		Input_pnl.setSize(new Dimension(frame.getWidth()/2, frame.getHeight()/2));
 		Input_pnl.setBackground(new Color(0,255,255,40));
@@ -546,6 +558,7 @@ public class UserInterface {
 			Input_pnl.add(preLb);
 			Input_pnl.add(preInput);
 			Input_pnl.add(enter);
+		
 			
 		frame.add(Input_pnl, BorderLayout.CENTER);
 		frame.add(split,BorderLayout.SOUTH);
