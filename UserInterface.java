@@ -288,14 +288,14 @@ public class UserInterface {
 					     
 					    int flag=0;//
 					    if(graph.isCyclic()) {
-					    	 output.append("Is Cyclic\n");
+					    	 output.append("ERROR:Is Cyclic\n");
 					    	 flag=1;
 					     }
 					    // else {output.append("Not Cyclic\n");}
 					    
 					    if(flag==0) {
 					     if(!graph.isConnecttoEnd(src)) {
-					    	 output.append("Not Connected\n");
+					    	 output.append("ERROR:Not Connected\n");
 					    	 flag=1;
 					     }
 					    // else {output.append("Connected\n");}
@@ -506,7 +506,7 @@ public class UserInterface {
 								p.replacedepstring(tp);
 								//System.out.println(p.depstring);
 								allTasks.add(p);//returns 1 predecessor
-								
+								output.append("Activity Entered!\n");
 								counter++;
 								
 							}
