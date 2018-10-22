@@ -81,6 +81,34 @@ public class UserInterface {
 			}
 		});
 		
+		cpath= new JButton("Critical Path");
+		cpath.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				allpathf.clear();
+				Pathgen( allTasks, allTasksFinished,allpathf, hmap);
+				Integer max=allpathf.get(0).get(0);
+				
+				for(int k=0;k<allpathf.size();k++) {
+			    	ArrayList<Integer> tpal=allpathf.get(k);
+			    	if(tpal.get(0)>=max) {
+			    	//int tp=tpal.get(0);
+			    	//tpal.set(0,tp+descost);
+			    	output.append("Critical path cost is "+tpal.get(0)+" path sequence is:");
+			    	for(int m=1;m<tpal.size();m++)
+			    	          {output.append(hmap.get(tpal.get(m)));
+			    	          output.append(" ");}
+			    	output.append("\n");
+			    	}
+			    	else return;
+			    	
+			    }
+				
+			}
+			
+		});
+		
 		
 		print = new JButton("Print");
 		print.addActionListener(new ActionListener() {
