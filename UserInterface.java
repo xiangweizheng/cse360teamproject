@@ -19,6 +19,10 @@ import cse360project.*;
 import cse360project.networkanalyzer.Task;
 import cse360project.wnetdiag.Graph;
 import cse360project.networkanalyzer;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
+
 /*
  * Class 360: Intro to Software Engineering
  * Contributors: 
@@ -30,12 +34,14 @@ import cse360project.networkanalyzer;
 @SuppressWarnings("serial")
 public class UserInterface {
 	private JFrame frame;
-	private JTextField task, duration, preInput;
+	private JTextField task, duration, preInput,duration2,task2;
 	private JTextArea output;
 	private JLabel tskLb, timeLb, preLb;
-	private JButton enter, reset, quit, print, clear,path,demo,demo_cycle,demo_connect,FinishEnter,help,about;
+	private JLabel tskLb2, timeLb2;
+	private JButton enter, reset, quit, print, clear,path,demo,demo_cycle,demo_connect,FinishEnter,help,about,cpath,change,filegen;
 	private JPanel Button_pnl, Input_pnl;
 	private Choice units;
+	private Choice units2;
 	private JSplitPane split;
 	private JRadioButton predecessor;
 	private Integer counter = 0;
@@ -49,6 +55,8 @@ public class UserInterface {
 		
 		HashSet<Task> allTasks = new HashSet<Task>();
 		HashSet<Task> allTasksFinished = new HashSet<Task>();
+		ArrayList<ArrayList<Integer>>allpathf=new ArrayList<ArrayList<Integer>>();
+		HashMap<Integer, String> hmap = new HashMap<Integer, String>(); 
 		
 		
 		FinishEnter = new JButton("FinishEnter");
@@ -64,12 +72,12 @@ public class UserInterface {
 				      //find a new task to add into graph
 				      for(Iterator<Task> it = allTasks.iterator();it.hasNext();){
 				        Task task = it.next();
-				        System.out.println(task.depstring);
+				        //System.out.println(task.depstring);
 				        for(int i=0;i<task.depstring.size();i++) {
 				        	if(getTask(allTasks,task.depstring.get(i))!=null)
 				        	task.adddep(getTask(allTasks,task.depstring.get(i)));
-				        	System.out.println(task.depstring.get(i));
-				        	System.out.println(getTask(allTasks,task.depstring.get(i)));
+				        	//System.out.println(task.depstring.get(i));
+				        	//System.out.println(getTask(allTasks,task.depstring.get(i)));
 				        }
 				        allTasksFinished.add(task);
 			
@@ -99,6 +107,34 @@ public class UserInterface {
 			
 		});
 		
+		cpath= new JButton("Critical Path");
+		cpath.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				allpathf.clear();
+				Pathgen( allTasks, allTasksFinished,allpathf, hmap);
+				Integer max=allpathf.get(0).get(0);
+				
+				for(int k=0;k<allpathf.size();k++) {
+			    	ArrayList<Integer> tpal=allpathf.get(k);
+			    	if(tpal.get(0)>=max) {
+			    	//int tp=tpal.get(0);
+			    	//tpal.set(0,tp+descost);
+			    	output.append("Critical path cost is "+tpal.get(0)+" path sequence is:");
+			    	for(int m=1;m<tpal.size();m++)
+			    	          {output.append(hmap.get(tpal.get(m)));
+			    	          output.append(" ");}
+			    	output.append("\n");
+			    	}
+			    	else return;
+			    	
+			    }
+				
+			}
+			
+		});
+		
 		
 		
 		help = new JButton("Help");
@@ -109,11 +145,21 @@ public class UserInterface {
 				output.append("To start, enter activity name/duration/dependency and press entern when finish one activity\n");
 				output.append("When all activity are entered,press finishenter button\n");
 				output.append("press print botton to show the activties\n");
-				output.append("press path botton to sho all the paths\n");
+				output.append("press path botton to show all the paths\n");
 				output.append("press clear text, to clear output text\n");
 				output.append("press quit, to quit program\n");
-				output.append("press different demo to load different stype demo\n");
+				output.append("press different demo to load different type demo\n");
 				output.append("To restart, press restart button\n");
+			}
+			
+		});
+		
+		filegen = new JButton("text file");
+		filegen.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 			
 		});
@@ -144,6 +190,8 @@ public class UserInterface {
 						counter=0;
 						allTasks.removeAll(allTasks);
 						allTasksFinished.removeAll(allTasksFinished);
+						allpathf.clear();
+						hmap.clear();
 					}
 					
 				});
@@ -229,145 +277,20 @@ public class UserInterface {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					// TODO Auto-generated method stub
-					  HashMap<Integer, String> hmap = new HashMap<Integer, String>(); 	   
-					    System.out.println(allTasksFinished);
-					  
-					    
-					    
-					    //initial value of source and destination task
-					    Integer src=99,des=99;
-					    Integer descost=0;
-					    ArrayList<Integer> desa=new ArrayList<Integer>();
-					    ArrayList<Integer> desacost=new ArrayList<Integer>();
-					    //process to generate graph from task
-					    HashSet<Task> dependtask = new HashSet<Task>();
-
-					    HashSet<Task> remaining = new HashSet<Task>(allTasksFinished);//load tasks into remaining
-					    Graph graph = new Graph(allTasks.size());
-                    
-					  
-					    while(!remaining.isEmpty()){
-
-					      //find a new task to add into graph
-					      for(Iterator<Task> it = remaining.iterator();it.hasNext();){
-					    	  
-					        Task task = it.next();
-					    
-					        hmap.put(task.id,task.name);//store task id and name into hashmap
-					        //find des node by dependencies empty
-					        if(task.dependencies.isEmpty()) {
-					        	des=task.id;
-					        	desa.add(des);
-					        	desacost.add(task.cost);
-					        	//System.out.println("des"+des);
-					        	descost=task.cost;}
-					        for(Task t : task.dependencies){
-					        	graph.addEgde(t.id, task.id,task.cost);
-					        	dependtask.add(t);
-					          }
-				        
-					        it.remove();
-					   
-					        
-					      }   
-					        
-					    }
-					    
-					    //calculate src node by defination it is not any task's dependency
-					    HashSet<Task> tmp = new HashSet<Task>(allTasksFinished);
-					    tmp.removeAll(dependtask);
-					    //System.out.println(tmp);
-					   // ArrayList<Integer> srcs=new ArrayList<Integer>();
-					    ArrayList<Integer> srcs=new ArrayList<Integer>();
-					    //int si=0;
-					    for(Iterator<Task> it = tmp.iterator();it.hasNext();){
-					    	Task task = it.next();
-					    	src=task.id;
-					    	srcs.add(src);
-					    }
-					     
-					    int flag=0;//
-					    if(graph.isCyclic()) {
-					    	 output.append("ERROR:Is Cyclic\n");
-					    	 flag=1;
-					     }
-					    // else {output.append("Not Cyclic\n");}
-					    
-					    if(flag==0) {
-					     if(!graph.isConnecttoEnd(src)) {
-					    	 output.append("ERROR:Not Connected\n");
-					    	 flag=1;
-					     }
-					    // else {output.append("Connected\n");}
-					     
-					    }
-					   
-					
-					     if(flag==0) {
-					     
-					    	
-					    	 
-					    //	 System.out.println(srcs);	//destination node array
-					    	// System.out.println(desa);	//source node array//in this requirement there is multiple desa
-					    	 
-					    	 
-					    	 ArrayList<ArrayList<ArrayList<Integer>>>allpathm=new ArrayList<ArrayList<ArrayList<Integer>>>();
-					    	 for(int jj=0;jj<desa.size();jj++) {  
-					    		 allpathm.add(graph.allpath(desa.get(jj),src));
-					    	 }
-					    	 
-					    	 ArrayList<ArrayList<Integer>>allpathf=new ArrayList<ArrayList<Integer>>();
-					    	 for(int k=0;k<allpathm.size();k++) {
-					    		 ArrayList<ArrayList<Integer>> tpaa=allpathm.get(k);
-					    		 for(int jj=0;jj<tpaa.size();jj++) {
-					    			 ArrayList<Integer> tpa=tpaa.get(jj);
-					    			 tpa.set(0,tpa.get(0)+desacost.get(k));
-					    			 allpathf.add(tpa);
-					    		 }
-							    	
-							    }
-					    	 Collections.sort(allpathf, new Comparator<ArrayList<Integer>>() {    
-							        @Override
-							        public int compare(ArrayList<Integer> o1, ArrayList<Integer> o2) {
-							            return o2.get(0).compareTo(o1.get(0));
-							        }               
-							});
-					    	 for(int k=0;k<allpathf.size();k++) {
-							    	ArrayList<Integer> tpal=allpathf.get(k);
-							    	//int tp=tpal.get(0);
-							    	//tpal.set(0,tp+descost);
-							    	output.append("path cost is "+tpal.get(0)+" path sequence is:");
-							    	for(int m=1;m<tpal.size();m++)
-							    	          {output.append(hmap.get(tpal.get(m)));
-							    	          output.append(" ");}
-							    	output.append("\n");
-							    	
-							    }
-					    	 
-					    	// System.out.println(allpathf);	 	 
-					    	 
-					/*    	 
-					ArrayList<ArrayList<Integer>>allpath= graph.allpath(des,src);
-					System.out.println(allpath);	 
-					
-				    Collections.sort(allpath, new Comparator<ArrayList<Integer>>() {    
-				        @Override
-				        public int compare(ArrayList<Integer> o1, ArrayList<Integer> o2) {
-				            return o2.get(0).compareTo(o1.get(0));
-				        }               
-				});
-					 for(int k=0;k<allpath.size();k++) {
-					    	ArrayList<Integer> tpal=allpath.get(k);
-					    	int tp=tpal.get(0);
-					    	tpal.set(0,tp+descost);
-					    	output.append("path cost is "+tpal.get(0)+" path sequence is:");
+					allpathf.clear();
+					Pathgen( allTasks, allTasksFinished,allpathf, hmap);
+			    	 for(int k=0;k<allpathf.size();k++) {
+					    	ArrayList<Integer> tpal=allpathf.get(k);
+					    	//int tp=tpal.get(0);
+					    	//tpal.set(0,tp+descost);
+					    	output.append("Path cost is "+tpal.get(0)+" path sequence is:");
 					    	for(int m=1;m<tpal.size();m++)
 					    	          {output.append(hmap.get(tpal.get(m)));
 					    	          output.append(" ");}
 					    	output.append("\n");
 					    	
-					    }*/
-				}
+					    }
+			    	 
 				}
 			});
 			
@@ -418,6 +341,8 @@ public class UserInterface {
 			Button_pnl.add(FinishEnter);
 			Button_pnl.add(help);
 			Button_pnl.add(about);
+			Button_pnl.add(cpath);
+			
 		Input_pnl = new JPanel(); //is the upper half of the frame for user input
 		Input_pnl.setSize(new Dimension(frame.getWidth()/2, frame.getHeight()/2));
 		Input_pnl.setBackground(new Color(0,255,255,40));
@@ -524,8 +449,11 @@ public class UserInterface {
 						}
 					}
 				}); // checks to see if duration is an integer and if user input activity name
-			
 				
+				
+				
+				
+			
 			
 			preInput = new JTextField(10); // Textfield to input predecessors of activity
 				preInput.setEnabled(false);
@@ -549,6 +477,87 @@ public class UserInterface {
 				has 0 predecessors. 
 				*/
 				
+				
+				
+				
+				tskLb2 = new JLabel("Enter Activity Name to change Here");
+				task2 = new JTextField(20); //textfield for activity input
+					task2.setMargin(new Insets(0,10,10,5));
+					
+				timeLb2 = new JLabel("Enter time of Activity to change (as integer)");
+
+				
+				duration2 = new JTextField(10);
+					duration.setMargin(new Insets(10,10,10,10));
+				units2 = new Choice();
+				units2.add("sec");
+				units2.add("min");
+				units2.add("hrs");
+				units2.add("days");	// units of duration
+				
+				change = new JButton("Change Duration");
+				change.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						
+						
+						
+						if(e.getSource() == change) {
+							boolean TaskisEmpty = task2.getText().trim().isEmpty();
+							if(TaskisEmpty == true) { // checks to see if user left Activity name empty
+								output.append("String is Empty\n");
+							}
+							boolean DurationisNumber = isNumber(duration2.getText());
+							int number = 0;
+							if(!DurationisNumber == true) {
+								output.append("Input valid number in Duration textfield\n"); //checks if text is an integer
+							}
+							else {
+								number = Integer.parseInt(duration2.getText());
+							}
+						
+						
+							//test
+							
+							
+							int change=0;
+						 if(!TaskisEmpty && DurationisNumber) {
+							 
+						      for(Iterator<Task> it = allTasks.iterator();it.hasNext();){
+							        Task taskc = it.next();
+							        System.out.println(taskc.toString()+"empty"+task.getText().trim());
+							         if(task2.getText().trim().equals(taskc.name))			
+						                {taskc.changecost(number);
+						                change=1;
+						                output.append("Activity Duration Changed!\n");
+						                allpathf.clear();
+						                output.append("Clear previous path!\n");
+						                }
+							        
+							      }  
+							 
+							   if(change==0)
+								output.append("Activity Not find!\n");
+							
+							}
+							
+							
+							task2.setText(""); //set field empty afterwards
+							duration2.setText("");//set field empty afterwards
+
+						}
+					
+					}
+					});
+				
+				
+				
+				
+				
+				
+				
+				
+				
 			Input_pnl.add(tskLb);
 			Input_pnl.add(task);
 			Input_pnl.add(timeLb);
@@ -558,6 +567,12 @@ public class UserInterface {
 			Input_pnl.add(preLb);
 			Input_pnl.add(preInput);
 			Input_pnl.add(enter);
+			Input_pnl.add(tskLb2);
+			Input_pnl.add(task2);
+			Input_pnl.add(timeLb2);
+			Input_pnl.add(duration2);
+			Input_pnl.add(units2);
+			Input_pnl.add(change);
 		
 			
 		frame.add(Input_pnl, BorderLayout.CENTER);
@@ -584,9 +599,9 @@ public class UserInterface {
 		if(!set.isEmpty()) {
 			for(Iterator<Task> it = set.iterator(); it.hasNext();) {
 				Task nt = it.next();
-				System.out.println(t+nt.name);
+				//System.out.println(t+nt.name);
 				if(t.equals(nt.name)) {
-					System.out.println("t+=nt.name");
+					//System.out.println("t+=nt.name");
 					return nt;
 				}
 			}
@@ -595,10 +610,140 @@ public class UserInterface {
 	}
 	
 	
+
 	
 	
+	public  void Pathgen(HashSet<Task> allTasks,HashSet<Task> allTasksFinished,ArrayList<ArrayList<Integer>>allpathf,HashMap<Integer, String> hmap){
+		//HashMap<Integer, String> hmap = new HashMap<Integer, String>(); 	   
+	    //System.out.println(allTasksFinished);
+	  
+	    
+	    
+	    //initial value of source and destination task
+	    Integer src=99,des=99;
+	    Integer descost=0;
+	    ArrayList<Integer> desa=new ArrayList<Integer>();
+	    ArrayList<Integer> desacost=new ArrayList<Integer>();
+	    //process to generate graph from task
+	    HashSet<Task> dependtask = new HashSet<Task>();
+
+	    HashSet<Task> remaining = new HashSet<Task>(allTasksFinished);//load tasks into remaining
+	    Graph graph = new Graph(allTasks.size());
+    
+	  
+	    while(!remaining.isEmpty()){
+
+	      //find a new task to add into graph
+	      for(Iterator<Task> it = remaining.iterator();it.hasNext();){
+	    	  
+	        Task task = it.next();
+	    
+	        hmap.put(task.id,task.name);//store task id and name into hashmap
+	        //find des node by dependencies empty
+	        if(task.dependencies.isEmpty()) {
+	        	des=task.id;
+	        	desa.add(des);
+	        	desacost.add(task.cost);
+	        	//System.out.println("des"+des);
+	        	descost=task.cost;}
+	        for(Task t : task.dependencies){
+	        	graph.addEgde(t.id, task.id,task.cost);
+	        	dependtask.add(t);
+	          }
+        
+	        it.remove();
+	   
+	        
+	      }   
+	        
+	    }
+	    
+	    //calculate src node by defination it is not any task's dependency
+	    HashSet<Task> tmp = new HashSet<Task>(allTasksFinished);
+	    tmp.removeAll(dependtask);
+	    //System.out.println(tmp);
+	   // ArrayList<Integer> srcs=new ArrayList<Integer>();
+	    ArrayList<Integer> srcs=new ArrayList<Integer>();
+	    //int si=0;
+	    for(Iterator<Task> it = tmp.iterator();it.hasNext();){
+	    	Task task = it.next();
+	    	src=task.id;
+	    	srcs.add(src);
+	    }
+	     
+	    int flag=0;//
+	    if(graph.isCyclic()) {
+	    	 output.append("ERROR:Is Cyclic\n");
+	    	 flag=1;
+	     }
+	    // else {output.append("Not Cyclic\n");}
+	    
+	    if(flag==0) {
+	     if(!graph.isConnecttoEnd(src)) {
+	    	 output.append("ERROR:Not Connected\n");
+	    	 flag=1;
+	     }
+	    // else {output.append("Connected\n");}
+	     
+	    }
+	   
 	
+	     if(flag==0) {
+	     
+	    	
+	    	 
+	    //	 System.out.println(srcs);	//destination node array
+	    	// System.out.println(desa);	//source node array//in this requirement there is multiple desa
+	    	 
+	    	 
+	    	 ArrayList<ArrayList<ArrayList<Integer>>>allpathm=new ArrayList<ArrayList<ArrayList<Integer>>>();
+	    	 for(int jj=0;jj<desa.size();jj++) {  
+	    		 allpathm.add(graph.allpath(desa.get(jj),src));
+	    	 }
+	    	 
+	    	 //ArrayList<ArrayList<Integer>>allpathf=new ArrayList<ArrayList<Integer>>();
+	    	 for(int k=0;k<allpathm.size();k++) {
+	    		 ArrayList<ArrayList<Integer>> tpaa=allpathm.get(k);
+	    		 for(int jj=0;jj<tpaa.size();jj++) {
+	    			 ArrayList<Integer> tpa=tpaa.get(jj);
+	    			 tpa.set(0,tpa.get(0)+desacost.get(k));
+	    			 allpathf.add(tpa);
+	    		 }
+			    	
+			    }
+	    	 Collections.sort(allpathf, new Comparator<ArrayList<Integer>>() {    
+			        @Override
+			        public int compare(ArrayList<Integer> o1, ArrayList<Integer> o2) {
+			            return o2.get(0).compareTo(o1.get(0));
+			        }               
+			});
+
+	    	// System.out.println(allpathf);	 	 
+	    	 
+	/*    	 
+	ArrayList<ArrayList<Integer>>allpath= graph.allpath(des,src);
+	System.out.println(allpath);	 
 	
+    Collections.sort(allpath, new Comparator<ArrayList<Integer>>() {    
+        @Override
+        public int compare(ArrayList<Integer> o1, ArrayList<Integer> o2) {
+            return o2.get(0).compareTo(o1.get(0));
+        }               
+});
+	 for(int k=0;k<allpath.size();k++) {
+	    	ArrayList<Integer> tpal=allpath.get(k);
+	    	int tp=tpal.get(0);
+	    	tpal.set(0,tp+descost);
+	    	output.append("path cost is "+tpal.get(0)+" path sequence is:");
+	    	for(int m=1;m<tpal.size();m++)
+	    	          {output.append(hmap.get(tpal.get(m)));
+	    	          output.append(" ");}
+	    	output.append("\n");
+	    	
+	    }*/
+}
+		
+	}
 	
 	
 	
