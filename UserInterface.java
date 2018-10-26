@@ -504,6 +504,75 @@ public class UserInterface {
 				/* checks if predecessor is toggled on/off. If it is off it is assumed the activity
 				has 0 predecessors. 
 				*/
+		tskLb2 = new JLabel("Enter Activity Name to change Here");
+				task2 = new JTextField(20); //textfield for activity input
+					task2.setMargin(new Insets(0,10,10,5));
+					
+				timeLb2 = new JLabel("Enter time of Activity to change (as integer)");
+
+				
+				duration2 = new JTextField(10);
+					duration.setMargin(new Insets(10,10,10,10));
+				units2 = new Choice();
+				units2.add("sec");
+				units2.add("min");
+				units2.add("hrs");
+				units2.add("days");	// units of duration
+				
+				change = new JButton("Change Duration");
+				change.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						
+						
+						
+						if(e.getSource() == change) {
+							boolean TaskisEmpty = task2.getText().trim().isEmpty();
+							if(TaskisEmpty == true) { // checks to see if user left Activity name empty
+								output.append("String is Empty\n");
+							}
+							boolean DurationisNumber = isNumber(duration2.getText());
+							int number = 0;
+							if(!DurationisNumber == true) {
+								output.append("Input valid number in Duration textfield\n"); //checks if text is an integer
+							}
+							else {
+								number = Integer.parseInt(duration2.getText());
+							}
+						
+						
+							//test
+							
+							
+							int change=0;
+						 if(!TaskisEmpty && DurationisNumber) {
+							 
+						      for(Iterator<Task> it = allTasks.iterator();it.hasNext();){
+							        Task taskc = it.next();
+							        System.out.println(taskc.toString()+"empty"+task.getText().trim());
+							         if(task2.getText().trim().equals(taskc.name))			
+						                {taskc.changecost(number);
+						                change=1;
+						                output.append("Activity Duration Changed!\n");
+						                allpathf.clear();
+						                output.append("Clear previous path!\n");
+						                }
+							        
+							      }  
+							 
+							   if(change==0)
+								output.append("Activity Not find!\n");
+							
+							}
+							
+							
+							task2.setText(""); //set field empty afterwards
+							duration2.setText("");//set field empty afterwards
+
+						}
+					
+					}
+					});
 				
 				
 				
