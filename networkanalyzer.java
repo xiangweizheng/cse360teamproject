@@ -249,5 +249,8 @@ public class networkanalyzer {
 		    public void printdepstring() {
 		    	 System.out.println(depstring);
 		    }
+		    public void changecost(Integer newcost) {
+		    	this.cost=newcost;
+		    }
 		  }
 	}
