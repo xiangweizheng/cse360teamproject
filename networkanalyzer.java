@@ -35,17 +35,7 @@ public class networkanalyzer {
 		    Task C = new Task("C",i++, 5, D, G);
 		    Task B = new Task("B",i++, 20, C);
 		    Task A = new Task("A",i++, 10, F,B,H);
-		    //C.adddep(B);
-		    /*
-		    A.adddepstring("a");
-		    A.adddepstring("b");
-		    ArrayList<String> test=new ArrayList<String>();
-		    test.add("c");
-		    A.printdepstring();
-		    A.replacedepstring(test);
-		    A.printdepstring();
-		    */
-		   // A.adddep(C);
+
 		    
 		    allTasks.add(A);
 		    allTasks.add(B);

@@ -19,8 +19,12 @@ import cse360project.*;
 import cse360project.networkanalyzer.Task;
 import cse360project.wnetdiag.Graph;
 import cse360project.networkanalyzer;
+
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 
 /*
@@ -89,34 +93,6 @@ public class UserInterface {
 			}
 		});
 		
-		cpath= new JButton("Critical Path");
-		cpath.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				allpathf.clear();
-				Pathgen( allTasks, allTasksFinished,allpathf, hmap);
-				Integer max=allpathf.get(0).get(0);
-				
-				for(int k=0;k<allpathf.size();k++) {
-			    	ArrayList<Integer> tpal=allpathf.get(k);
-			    	if(tpal.get(0)>=max) {
-			    	//int tp=tpal.get(0);
-			    	//tpal.set(0,tp+descost);
-			    	output.append("Critical path cost is "+tpal.get(0)+" path sequence is:");
-			    	for(int m=1;m<tpal.size();m++)
-			    	          {output.append(hmap.get(tpal.get(m)));
-			    	          output.append(" ");}
-			    	output.append("\n");
-			    	}
-			    	else return;
-			    	
-			    }
-				
-			}
-			
-		});
-		
 		
 		print = new JButton("Print");
 		print.addActionListener(new ActionListener() {
@@ -182,12 +158,73 @@ public class UserInterface {
 			
 		});
 		
-		filegen = new JButton("text file");
+		filegen = new JButton("gen text file");
 		filegen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				
+				PrintWriter writer;
+				try {
+					writer = new PrintWriter("report.txt");
+					writer.println("Title: Report for CSE 360");
+					  DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+					   LocalDateTime now = LocalDateTime.now();  
+					   writer.println("Date and time:" +dtf.format(now));  
+					   writer.println("The List of all activities in alphanumeric order with current duration:");
+					   //generate task array from hashset
+					   
+					   ArrayList<ArrayList<String>> outarray=new ArrayList<ArrayList<String>>();
+					      //ArrayList<String>taskname_c=new ArrayList<String>();
+					      for(Iterator<Task> it = allTasksFinished.iterator();it.hasNext();){
+						        Task taskp = it.next();
+						        ArrayList<String>taskname_c=new ArrayList<String>();
+						        taskname_c.add(taskp.name);
+						        taskname_c.add(Integer.toString(taskp.cost));
+						        outarray.add(taskname_c);
+					           
+						      }
+					      Collections.sort(outarray, new Comparator<ArrayList<String>>() {    
+						        @Override
+						        public int compare(ArrayList<String> o1, ArrayList<String> o2) {
+						            return o1.get(0).compareTo(o2.get(0));
+						        }               
+						});
+					      if(outarray.size()<=0) writer.println("List of activity is emtpy, press finishenter to load activities");
+					      else {
+					      for(int k=0;k<outarray.size();k++) {
+						    	ArrayList<String> tpal=outarray.get(k);
+						    	writer.println("Activity name:" +tpal.get(0)+"   "+"Activity duration:" +tpal.get(1));
+							   						    	
+						    	
+						    	
+						    }
+					      }
+					      
+					      if(outarray.size()<=0) writer.println("List of path is emtpy, press process to generate paths");
+					      else {
+					      for(int k=0;k<allpathf.size();k++) {
+						    	ArrayList<Integer> tpal=allpathf.get(k);
+						    	//int tp=tpal.get(0);
+						    	//tpal.set(0,tp+descost);
+						    	writer.println("Path cost is "+tpal.get(0)+" path sequence is:");
+						    	ArrayList<String> path=new ArrayList<String>();
+						    	for(int m=1;m<tpal.size();m++)
+						 	          {path.add(hmap.get(tpal.get(m)));
+						    		
+						    	          }
+						    	writer.println(path);
+					      }	
+						    	
+					      
+					   
+					writer.close();
+					      }	
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					System.out.println("No such file exists.");
+				}
+			
 			}
 			
 		});
@@ -331,7 +368,7 @@ public class UserInterface {
 				public void actionPerformed(ActionEvent arg0) {
 					// TODO Auto-generated method stub
 					int i=0;//task id
-					  
+					/*  
 					Task E = new Task("E",i++,20);
 				    Task G = new Task("G",i++,5,E);
 				    Task F = new Task("F",i++,15,G);
@@ -340,7 +377,17 @@ public class UserInterface {
 				    Task C = new Task("C",i++, 5, D, G);
 				    Task B = new Task("B",i++, 20, C);
 				    Task A = new Task("A",i++, 10, F,B,H);
-
+                    */
+					Task A = new Task("A",i++,10);
+					Task B = new Task("B",i++,20,A);
+					Task F = new Task("F",i++,15,A);
+					Task H = new Task("H",i++,15,A);
+					Task C = new Task("C",i++,5,B);
+					Task D = new Task("D",i++,10,C);
+					Task G = new Task("G",i++,5,C,F);
+					Task E = new Task("E",i++,20,G,H,D);
+					
+					
 				    allTasks.add(A);
 				    allTasks.add(B);
 				    allTasks.add(C);
@@ -370,6 +417,7 @@ public class UserInterface {
 			Button_pnl.add(help);
 			Button_pnl.add(about);
 			Button_pnl.add(cpath);
+			Button_pnl.add(filegen);
 			
 		Input_pnl = new JPanel(); //is the upper half of the frame for user input
 		Input_pnl.setSize(new Dimension(frame.getWidth()/2, frame.getHeight()/2));
@@ -504,75 +552,6 @@ public class UserInterface {
 				/* checks if predecessor is toggled on/off. If it is off it is assumed the activity
 				has 0 predecessors. 
 				*/
-		tskLb2 = new JLabel("Enter Activity Name to change Here");
-				task2 = new JTextField(20); //textfield for activity input
-					task2.setMargin(new Insets(0,10,10,5));
-					
-				timeLb2 = new JLabel("Enter time of Activity to change (as integer)");
-
-				
-				duration2 = new JTextField(10);
-					duration.setMargin(new Insets(10,10,10,10));
-				units2 = new Choice();
-				units2.add("sec");
-				units2.add("min");
-				units2.add("hrs");
-				units2.add("days");	// units of duration
-				
-				change = new JButton("Change Duration");
-				change.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						
-						
-						
-						if(e.getSource() == change) {
-							boolean TaskisEmpty = task2.getText().trim().isEmpty();
-							if(TaskisEmpty == true) { // checks to see if user left Activity name empty
-								output.append("String is Empty\n");
-							}
-							boolean DurationisNumber = isNumber(duration2.getText());
-							int number = 0;
-							if(!DurationisNumber == true) {
-								output.append("Input valid number in Duration textfield\n"); //checks if text is an integer
-							}
-							else {
-								number = Integer.parseInt(duration2.getText());
-							}
-						
-						
-							//test
-							
-							
-							int change=0;
-						 if(!TaskisEmpty && DurationisNumber) {
-							 
-						      for(Iterator<Task> it = allTasks.iterator();it.hasNext();){
-							        Task taskc = it.next();
-							        System.out.println(taskc.toString()+"empty"+task.getText().trim());
-							         if(task2.getText().trim().equals(taskc.name))			
-						                {taskc.changecost(number);
-						                change=1;
-						                output.append("Activity Duration Changed!\n");
-						                allpathf.clear();
-						                output.append("Clear previous path!\n");
-						                }
-							        
-							      }  
-							 
-							   if(change==0)
-								output.append("Activity Not find!\n");
-							
-							}
-							
-							
-							task2.setText(""); //set field empty afterwards
-							duration2.setText("");//set field empty afterwards
-
-						}
-					
-					}
-					});
 				
 				
 				
